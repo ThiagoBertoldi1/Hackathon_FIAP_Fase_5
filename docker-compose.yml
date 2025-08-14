@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: videochecker_api
+    build:
+      context: ./api/VideoChecker/VideoChecker.API
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Staging"
+      ASPNETCORE_HTTP_PORTS: "5056"
+    ports:
+      - "5056:5056"
+    networks:
+      - app-net
+
+  worker:
+    container_name: videochecker_worker
+    build:
+      context: ./rabbitmq/VideoChecker/VideoChecker.Processor
+      dockerfile: Dockerfile
+    environment:
+      DOTNET_ENVIRONMENT: "Staging"
+    networks:
+      - app-net
+
+  frontend:
+    container_name: videochecker_front
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_BASE_URL: "http://localhost:5056"
+    ports:
+      - "5173:80"
+    networks:
+      - app-net
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: videochecker_rabbitmq
+    ports:
+      - "5672:5672"     # Porta usada pelas aplicações (AMQP)
+      - "15672:15672"   # Painel de administração (web)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
