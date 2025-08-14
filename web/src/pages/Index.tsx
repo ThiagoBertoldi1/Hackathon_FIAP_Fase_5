@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Upload, RefreshCw } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import DataGrid from '@/components/DataGrid';
 import VideoUploadModal from '@/components/VideoUploadModal';
 
@@ -12,8 +12,8 @@ const Index = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Dashboard
-              <span className="bg-gradient-primary bg-clip-text text-transparent"> Dinâmico</span>
+              Video
+              <span className="bg-gradient-primary bg-clip-text text-transparent"> Checker</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Acompanhe informações em tempo real com atualizações automáticas a cada 5 segundos
@@ -29,15 +29,6 @@ const Index = () => {
                   Upload de Vídeo
                 </Button>
               </VideoUploadModal>
-              
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-border hover:bg-muted transition-all duration-300"
-              >
-                <RefreshCw className="mr-2 h-5 w-5" />
-                Atualizar Dados
-              </Button>
             </div>
           </div>
         </div>
@@ -50,7 +41,7 @@ const Index = () => {
             Dados em Tempo Real
           </h2>
           <p className="text-muted-foreground">
-            Grid atualizado automaticamente com informações da API
+            Acompanhe o processamento em tempo real
           </p>
         </div>
         
@@ -61,7 +52,7 @@ const Index = () => {
       <footer className="border-t border-border mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2024 Dashboard Dinâmico. Dados atualizados em tempo real.</p>
+            <p>Um footer legal :D</p>
           </div>
         </div>
       </footer>
