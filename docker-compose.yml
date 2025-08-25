@@ -48,6 +48,19 @@ services:
     networks:
       - app-net
 
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./_data/_db:/data/db
+      - ./_data/_scripts:/docker-entrypoint-initdb.d:ro
+
 networks:
   app-net:
     driver: bridge
