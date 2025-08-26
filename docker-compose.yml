@@ -4,8 +4,8 @@ services:
   api:
     container_name: videochecker_api
     build:
-      context: ./api/VideoChecker/VideoChecker.API
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api/VideoChecker/VideoChecker.API/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Staging"
       ASPNETCORE_HTTP_PORTS: "5056"
@@ -50,7 +50,7 @@ services:
 
   mongo:
     image: mongo:7
-    container_name: mongo
+    container_name: videochecker_mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -58,8 +58,13 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpass
     volumes:
-      - ./_data/_db:/data/db
+      - mongo_data:/data/db
       - ./_data/_scripts:/docker-entrypoint-initdb.d:ro
+    networks:
+      - app-net
+      
+volumes:
+  mongo_data:
 
 networks:
   app-net:
