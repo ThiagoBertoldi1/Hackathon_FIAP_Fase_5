@@ -26,7 +26,7 @@ internal class MongoService(IConfiguration configuration) : IMongoService
     public async Task<ObjectId> UploadVideo(string name, Stream file)
     {
         var ct = new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token;
-        return await GetBucket().UploadFromStreamAsync(name, file/*, cancellationToken: ct*/);
+        return await GetBucket().UploadFromStreamAsync(name, file, cancellationToken: ct);
     }
 
     public async Task<(Stream, string, string)?> DownloadVideo(ObjectId objectId)
