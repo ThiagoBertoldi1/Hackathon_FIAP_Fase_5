@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\VideoChecker.Data\VideoChecker.Data.csproj" />
     <ProjectReference Include="..\VideoChecker.Domain\VideoChecker.Domain.csproj" />
+    <ProjectReference Include="..\VideoChecker.Infra\VideoChecker.Infra.csproj" />
     <ProjectReference Include="..\..\..\SharedEntities\SharedEntities.csproj" />
   </ItemGroup>
 

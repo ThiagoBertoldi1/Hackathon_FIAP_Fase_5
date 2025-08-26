@@ -1,19 +1,49 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using SharedEntities;
 using VideoChecker.Domain.Interfaces.RepositoriesInterfaces;
 
 namespace VideoChecker.Data.Repository;
 
-public class VideoCheckerRepository(IMongoService service) : IVideoCheckerRepository
+public class VideoCheckerRepository(IConfiguration configuration) : MongoService(configuration), IVideoCheckerRepository
 {
-    private readonly IMongoService _service = service;
 
     public async Task<ObjectId> SaveVideo(string name, Stream video)
     {
-        return await _service.UploadVideo(name, video);
+        var ct = new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token;
+        return await GetBucket().UploadFromStreamAsync(name, video, cancellationToken: ct);
     }
 
     public async Task<(Stream, string, string)?> GetVideo(ObjectId objectId)
     {
-        return await _service.DownloadVideo(objectId);
+        var stream = await GetBucket().OpenDownloadStreamAsync(objectId);
+
+        if (stream.Length == 0)
+            return null;
+
+        var info = stream.FileInfo;
+
+        var contentType = info.Metadata?.GetValue("contentType", null)?.AsString;
+        if (string.IsNullOrWhiteSpace(contentType))
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(info.Filename, out contentType))
+                contentType = "application/octet-stream";
+        }
+
+        return (stream, contentType, info.Filename);
+    }
+
+    public async Task Insert<T>(T data)
+    {
+        var collection = GetCollection<T>();
+        await collection.InsertOneAsync(data);
+    }
+
+    public async Task<VideoJobStatusChanged?> GetByObjectId(ObjectId objectId)
+    {
+        return await GetCollection<VideoJobStatusChanged>().Find(x => x.JobId == objectId).FirstOrDefaultAsync();
     }
 }

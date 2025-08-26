@@ -1,6 +1,6 @@
 using Microsoft.OpenApi.Models;
 using VideoChecker.API.DI;
-using VideoChecker.Data.DI;
+using VideoChecker.Infra.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,8 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddServicesDI();
 builder.Services.AddRepositoriesDI();
-
-builder.Services.AddMongoDI();
+builder.Services.AddInfraDI();
 
 builder.Services.AddCors(options =>
 {

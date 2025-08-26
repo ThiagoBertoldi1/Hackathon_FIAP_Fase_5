@@ -1,22 +1,38 @@
-﻿using SharedEntities.Enums;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using SharedEntities.Enums;
 
 namespace SharedEntities;
 
 public record VideoJobCreated(
-    string JobId,
+    [property: BsonId, BsonRepresentation(BsonType.ObjectId)]
+    ObjectId Id,
+
+    [property: BsonRepresentation(BsonType.ObjectId)]
+    ObjectId JobId,
+
     string OriginalFileName,
-    string StoragePath,
     DateTime CreatedAtUtc);
 
+
 public record VideoJobStatusChanged(
-    string JobId,
+    [property: BsonId, BsonRepresentation(BsonType.ObjectId)]
+    ObjectId Id,
+
+    [property: BsonRepresentation(BsonType.ObjectId)]
+    ObjectId JobId,
+
     StatusEnum Status,
-    int? ProgressPercent,
     string? Message,
     DateTime ChangedAtUtc);
 
 public record QrCodeFound(
-    string JobId,
+    [property: BsonId, BsonRepresentation(BsonType.ObjectId)]
+    ObjectId Id,
+
+    [property: BsonRepresentation(BsonType.ObjectId)]
+    ObjectId JobId,
+
     double TimestampSeconds,
     string Content,
     DateTime FoundAtUtc);

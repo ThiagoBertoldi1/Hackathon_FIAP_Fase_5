@@ -29,4 +29,14 @@ public class VideoCheckerController(IVideoCheckerService videoCheckerService) : 
             ? NotFound("Video not found")
             : File(file, type, name);
     }
+
+    [HttpGet("job-status")]
+    public async Task<IActionResult> GetByObjectId([FromQuery] string id)
+    {
+        var response = await _videoCheckerService.GetByObjectId(id);
+
+        return response is null
+            ? NotFound("Job not found")
+            : Ok(response);
+    }
 }

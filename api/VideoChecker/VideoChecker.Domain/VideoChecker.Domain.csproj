@@ -11,4 +11,9 @@
     <PackageReference Include="MongoDB.Bson" Version="3.4.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\SharedEntities\SharedEntities.csproj" />
+    <ProjectReference Include="..\VideoChecker.Infra\VideoChecker.Infra.csproj" />
+  </ItemGroup>
+
 </Project>

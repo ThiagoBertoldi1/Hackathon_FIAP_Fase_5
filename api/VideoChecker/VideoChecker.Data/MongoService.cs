@@ -1,51 +1,27 @@
-﻿using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Bson;
+﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 
 namespace VideoChecker.Data;
 
-internal class MongoService(IConfiguration configuration) : IMongoService
+public class MongoService(IConfiguration configuration)
 {
-    private readonly MongoClient _client = new(configuration.GetConnectionString("DB"));
+    private readonly MongoClient _client = new(configuration.GetConnectionString("Bucket"));
 
     private GridFSBucket? _bucket = null;
 
-    private GridFSBucket GetBucket()
+    private IMongoDatabase GetBanco()
     {
-        if (_bucket is null)
-        {
-            var db = _client.GetDatabase("filesdb");
-            _bucket = new GridFSBucket(db);
-        }
-
-        return _bucket;
+        return _client.GetDatabase("filesdb");
     }
 
-    public async Task<ObjectId> UploadVideo(string name, Stream file)
+    protected GridFSBucket GetBucket()
     {
-        var ct = new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token;
-        return await GetBucket().UploadFromStreamAsync(name, file, cancellationToken: ct);
+        return _bucket ??= new GridFSBucket(GetBanco());
     }
 
-    public async Task<(Stream, string, string)?> DownloadVideo(ObjectId objectId)
+    protected IMongoCollection<T> GetCollection<T>()
     {
-        var stream = await GetBucket().OpenDownloadStreamAsync(objectId);
-
-        if (stream.Length == 0)
-            return null;
-
-        var info = stream.FileInfo;
-
-        var contentType = info.Metadata?.GetValue("contentType", null)?.AsString;
-        if (string.IsNullOrWhiteSpace(contentType))
-        {
-            var provider = new FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(info.Filename, out contentType))
-                contentType = "application/octet-stream";
-        }
-
-        return (stream, contentType, info.Filename);
+        return GetBanco().GetCollection<T>(typeof(T).Name);
     }
 }
