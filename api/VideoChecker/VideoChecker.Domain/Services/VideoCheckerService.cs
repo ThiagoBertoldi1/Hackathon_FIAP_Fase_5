@@ -18,8 +18,11 @@ public class VideoCheckerService(IVideoCheckerRepository repository) : IVideoChe
         return await _repository.SaveVideo(video.Name, stream);
     }
 
-    public async Task<(Stream, string, string)?> DownloadVideo(ObjectId objectId)
+    public async Task<(Stream, string, string)?> DownloadVideo(string id)
     {
+        if (!ObjectId.TryParse(id, out var objectId) || objectId == ObjectId.Empty)
+            return null;
+
         return await _repository.GetVideo(objectId);
     }
 }

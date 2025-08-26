@@ -23,10 +23,7 @@ public class VideoCheckerController(IVideoCheckerService videoCheckerService) : 
     [HttpGet("get")]
     public async Task<IActionResult> GetAll([FromQuery] string id)
     {
-        if (!ObjectId.TryParse(id, out var objectId))
-            return BadRequest("Invalid id");
-
-        var (file, type, name) = (await _videoCheckerService.DownloadVideo(objectId)).Value;
+        var (file, type, name) = (await _videoCheckerService.DownloadVideo(id)).Value;
 
         return file is null || file.Length == 0
             ? NotFound("Video not found")

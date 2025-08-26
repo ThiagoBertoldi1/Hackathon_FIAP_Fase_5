@@ -6,5 +6,5 @@ namespace VideoChecker.Domain.Interfaces.ServicesInterfaces;
 public interface IVideoCheckerService
 {
     Task<ObjectId> UploadVideo(IFormFile video);
-    Task<(Stream, string, string)?> DownloadVideo(ObjectId objectId);
+    Task<(Stream, string, string)?> DownloadVideo(string id);
 }
