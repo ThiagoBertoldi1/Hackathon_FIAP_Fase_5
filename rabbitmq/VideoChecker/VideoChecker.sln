@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36408.4 d17.14
+VisualStudioVersion = 17.14.36408.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoChecker.Processor", "VideoChecker.Processor\VideoChecker.Processor.csproj", "{0BFBD993-B798-47B7-A8CC-F0A02C7C9CC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedEntities", "..\..\SharedEntities\SharedEntities.csproj", "{2B8825AA-970D-4F97-D017-737431B835D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{0BFBD993-B798-47B7-A8CC-F0A02C7C9CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BFBD993-B798-47B7-A8CC-F0A02C7C9CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BFBD993-B798-47B7-A8CC-F0A02C7C9CC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B8825AA-970D-4F97-D017-737431B835D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B8825AA-970D-4F97-D017-737431B835D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B8825AA-970D-4F97-D017-737431B835D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B8825AA-970D-4F97-D017-737431B835D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

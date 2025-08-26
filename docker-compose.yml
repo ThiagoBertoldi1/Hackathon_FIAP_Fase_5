@@ -17,8 +17,8 @@ services:
   worker:
     container_name: videochecker_worker
     build:
-      context: ./rabbitmq/VideoChecker/VideoChecker.Processor
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: rabbitmq/VideoChecker/VideoChecker.Processor/Dockerfile
     environment:
       DOTNET_ENVIRONMENT: "Staging"
     networks:

@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Microsoft.AspNetCore.Http;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SharedEntities.Enums;
 
@@ -11,7 +12,7 @@ public record VideoJobCreated(
     [property: BsonRepresentation(BsonType.ObjectId)]
     ObjectId JobId,
 
-    string OriginalFileName,
+    IFormFile Video,
     DateTime CreatedAtUtc);
 
 

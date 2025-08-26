@@ -5,15 +5,19 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["VideoChecker.Processor.csproj", "."]
-RUN dotnet restore "VideoChecker.Processor.csproj"
+COPY rabbitmq/VideoChecker/VideoChecker.Processor/VideoChecker.Processor.csproj rabbitmq/VideoChecker/VideoChecker.Processor/
+COPY SharedEntities/SharedEntities.csproj SharedEntities/
 
-COPY . .
-RUN dotnet build "VideoChecker.Processor.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet restore "rabbitmq/VideoChecker/VideoChecker.Processor/VideoChecker.Processor.csproj"
+
+COPY rabbitmq/VideoChecker/ rabbitmq/VideoChecker/
+COPY SharedEntities/ SharedEntities/
+
+RUN dotnet build "rabbitmq/VideoChecker/VideoChecker.Processor/VideoChecker.Processor.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "VideoChecker.Processor.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "rabbitmq/VideoChecker/VideoChecker.Processor/VideoChecker.Processor.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

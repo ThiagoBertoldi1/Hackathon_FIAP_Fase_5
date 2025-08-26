@@ -20,16 +20,15 @@ public class VideoCheckerService(
         if (video is null || video.Length == 0)
             return ObjectId.Empty;
 
-        using var stream = video.OpenReadStream();
-        var objectId = await _repository.SaveVideo(video.FileName, stream);
+        var jobId = ObjectId.GenerateNewId();
 
-        var jobChange = new VideoJobStatusChanged(ObjectId.GenerateNewId(), objectId, StatusEnum.Pending, "Registro inserido para processamento", DateTime.UtcNow);
+        var jobChange = new VideoJobStatusChanged(ObjectId.GenerateNewId(), jobId, StatusEnum.Pending, "Registro inserido para processamento", DateTime.UtcNow);
         await _repository.Insert(jobChange);
 
-        var job = new VideoJobCreated(ObjectId.GenerateNewId(), objectId, video.FileName, DateTime.UtcNow);
+        var job = new VideoJobCreated(ObjectId.GenerateNewId(), jobId, video, DateTime.UtcNow);
         await _queueService.Publish("Queue.CreatedJob", job);
 
-        return objectId;
+        return jobId;
     }
 
     public async Task<(Stream, string, string)?> DownloadVideo(string id)

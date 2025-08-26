@@ -9,13 +9,6 @@ namespace VideoChecker.Data.Repository;
 
 public class VideoCheckerRepository(IConfiguration configuration) : MongoService(configuration), IVideoCheckerRepository
 {
-
-    public async Task<ObjectId> SaveVideo(string name, Stream video)
-    {
-        var ct = new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token;
-        return await GetBucket().UploadFromStreamAsync(name, video, cancellationToken: ct);
-    }
-
     public async Task<(Stream, string, string)?> GetVideo(ObjectId objectId)
     {
         var stream = await GetBucket().OpenDownloadStreamAsync(objectId);
