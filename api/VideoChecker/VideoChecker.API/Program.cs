@@ -1,9 +1,15 @@
 using Microsoft.OpenApi.Models;
+using VideoChecker.API.DI;
+using VideoChecker.Data.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddServicesDI();
+builder.Services.AddRepositoriesDI();
+
+builder.Services.AddMongoDI();
 
 builder.Services.AddCors(options =>
 {
@@ -25,11 +31,6 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
 
 app.UseSwagger();
 app.UseSwaggerUI();
