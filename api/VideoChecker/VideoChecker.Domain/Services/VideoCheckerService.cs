@@ -20,12 +20,13 @@ public class VideoCheckerService(
         if (video is null || video.Length == 0)
             return ObjectId.Empty;
 
-        var jobId = ObjectId.GenerateNewId();
+        using var stream = video.OpenReadStream();
+        var jobId = await _repository.SaveVideo(video.FileName, stream);
 
         var jobChange = new VideoJobStatusChanged(ObjectId.GenerateNewId(), jobId, StatusEnum.Pending, "Registro inserido para processamento", DateTime.UtcNow);
         await _repository.Insert(jobChange);
 
-        var job = new VideoJobCreated(ObjectId.GenerateNewId(), jobId, video, DateTime.UtcNow);
+        var job = new VideoJobCreated(ObjectId.GenerateNewId(), jobId, DateTime.UtcNow);
         await _queueService.Publish("Queue.CreatedJob", job);
 
         return jobId;

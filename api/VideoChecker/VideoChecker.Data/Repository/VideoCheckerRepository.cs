@@ -39,4 +39,9 @@ public class VideoCheckerRepository(IConfiguration configuration) : MongoService
     {
         return await GetCollection<VideoJobStatusChanged>().Find(x => x.JobId == objectId).FirstOrDefaultAsync();
     }
+
+    public async Task<ObjectId> SaveVideo(string name, Stream file)
+    {
+        return await UploadVideo(name, file);
+    }
 }

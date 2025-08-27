@@ -1,10 +1,11 @@
-using Newtonsoft.Json;
+using MongoDB.Bson;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using SharedEntities;
 using SharedEntities.Enums;
 using System.Text;
+using System.Text.Json;
 using VideoChecker.Processor.Interfaces;
 
 namespace VideoChecker.Processor;
@@ -32,7 +33,7 @@ public class Worker(
 
             await Processar(channel, "Queue.CreatedJob", stoppingToken);
 
-            while (!stoppingToken.IsCancellationRequested) { }
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
         catch (BrokerUnreachableException)
         {
@@ -68,37 +69,41 @@ public class Worker(
             var body = eventArgs.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
 
-            var entity = JsonConvert.DeserializeObject<VideoJobCreated>(message)!;
-
-            _logger.LogInformation("{m}", message);
-
             try
             {
-                var videoInserted = await _repository.SaveVideo(entity.Video);
-                if (!videoInserted)
-                    throw new Exception("Erro ao salvar vídeo");
+                var entity = JsonSerializer.Deserialize<VideoJobCreated>(message)!;
 
-                var statusChanged = await _repository.UpdateJobStatus(entity.JobId, StatusEnum.Processing, "Vídeo sendo processado");
-                if (!statusChanged)
-                    throw new Exception("Erro ao atualizar status do job");
+                _logger.LogInformation("{m}", message);
 
-                await ProcessaVideo();
+                try
+                {
+                    var statusChanged = await _repository.UpdateJobStatus(entity.JobId, StatusEnum.Processing, "Vídeo sendo processado");
+                    if (!statusChanged)
+                        throw new Exception("Erro ao atualizar status do job");
 
-                await ((AsyncEventingBasicConsumer)sender).Channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
+                    await ProcessaVideo(entity.JobId);
+
+                    await ((AsyncEventingBasicConsumer)sender).Channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Erro ao processar mensagem");
+                    try
+                    {
+                        await _repository.UpdateJobStatus(entity.JobId, StatusEnum.Failed, $"Falha: {ex.Message}");
+                    }
+                    catch (Exception uex)
+                    {
+                        _logger.LogError(uex, "Erro ao atualizar status para Failed");
+                    }
+
+                    await consumer.Channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, requeue: false);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro ao processar mensagem");
-                try
-                {
-                    await _repository.UpdateJobStatus(entity.JobId, StatusEnum.Failed, $"Falha: {ex.Message}");
-                }
-                catch (Exception uex)
-                {
-                    _logger.LogError(uex, "Erro ao atualizar status para Failed");
-                }
-
-                await consumer.Channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, requeue: true);
+                _logger.LogError(ex, "Erro ao desserializar objeto");
+                await consumer.Channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, requeue: false);
             }
         };
 
@@ -109,11 +114,15 @@ public class Worker(
             cancellationToken);
     }
 
-    private async Task ProcessaVideo()
+    private async Task ProcessaVideo(ObjectId jobId)
     {
+        var video = await _repository.DownloadVideo(jobId);
         // processar vídeo
         // // quebrar vídeo em frames
         // // salvar qr code encontrado
-        // // trocar status do job
+
+        var statusChanged = await _repository.UpdateJobStatus(jobId, StatusEnum.Processing, "Vídeo sendo processado");
+        if (!statusChanged)
+            throw new Exception("Erro ao atualizar status do job");
     }
 }

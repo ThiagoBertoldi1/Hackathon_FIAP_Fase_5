@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using SharedEntities;
 using SharedEntities.Enums;
@@ -10,6 +9,11 @@ namespace VideoChecker.Processor.Repository;
 
 public class QueueRepository(IConfiguration configuration) : MongoBase(configuration), IQueueRepository
 {
+    public async Task<Stream> DownloadVideo(ObjectId jobId)
+    {
+        return await GetBucket().OpenDownloadStreamAsync(jobId);
+    }
+
     public async Task<bool> InsertEntity<T>(T entity)
     {
         try
@@ -19,17 +23,6 @@ public class QueueRepository(IConfiguration configuration) : MongoBase(configura
             return true;
         }
         catch { return false; }
-    }
-
-    public async Task<bool> SaveVideo(IFormFile video)
-    {
-        var ct = new CancellationTokenSource(TimeSpan.FromSeconds(15)).Token;
-
-        using var stream = video.OpenReadStream();
-
-        var objectId = await GetBucket().UploadFromStreamAsync(video.Name, stream, cancellationToken: ct);
-
-        return objectId != ObjectId.Empty;
     }
 
     public async Task<bool> UpdateJobStatus(ObjectId objectId, StatusEnum status, string message)

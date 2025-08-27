@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using SharedEntities;
 using VideoChecker.API.DI;
 using VideoChecker.Infra.DI;
 
@@ -9,6 +10,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddServicesDI();
 builder.Services.AddRepositoriesDI();
 builder.Services.AddInfraDI();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new ObjectIdSystemTextConverter()));
 
 builder.Services.AddCors(options =>
 {
