@@ -9,4 +9,5 @@ public interface IVideoCheckerService
     Task<ObjectId> UploadVideo(IFormFile video);
     Task<(Stream, string, string)?> DownloadVideo(string id);
     Task<VideoJobStatusChanged?> GetByObjectId(string id);
+    Task<List<QrCodeFound>> GetQrCodeFounds(string id);
 }

@@ -44,4 +44,9 @@ public class VideoCheckerRepository(IConfiguration configuration) : MongoService
     {
         return await UploadVideo(name, file);
     }
+
+    public Task<List<QrCodeFound>> GetQrCodeFounds(ObjectId objectId)
+    {
+        return GetCollection<QrCodeFound>().Find(x => x.JobId == objectId).ToListAsync();
+    }
 }

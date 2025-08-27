@@ -39,4 +39,13 @@ public class VideoCheckerController(IVideoCheckerService videoCheckerService) : 
             ? NotFound("Job not found")
             : Ok(response);
     }
+
+    [HttpGet("qrcodes-founds")]
+    public async Task<IActionResult> GetQrCodesFound([FromQuery] string id)
+    {
+        var response = await _videoCheckerService.GetQrCodeFounds(id);
+        return response is null || response.Count == 0
+            ? NotFound("No QR codes found for this job")
+            : Ok(response);
+    }
 }

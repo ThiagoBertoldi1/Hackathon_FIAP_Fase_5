@@ -47,4 +47,12 @@ public class VideoCheckerService(
 
         return await _repository.GetByObjectId(objectId);
     }
+
+    public async Task<List<QrCodeFound>> GetQrCodeFounds(string id)
+    {
+        if (!ObjectId.TryParse(id, out var objectId) || objectId == ObjectId.Empty)
+            return [];
+
+        return await _repository.GetQrCodeFounds(objectId);
+    }
 }
