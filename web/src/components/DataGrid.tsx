@@ -224,7 +224,14 @@ const DataGrid = () => {
                       <CardContent>
                         <div className="bg-background/50 p-4 rounded-lg border border-border">
                           <p className="text-sm text-card-foreground leading-relaxed">
-                            {qrCodes.map((item, i) => (<p>{i} - <a href={item.content} target="_blank">{item.content}</a></p>))}
+                            {qrCodes.map((item, _) => 
+                              (
+                                <p>{item.timestampSeconds.toFixed(2)}s - 
+                                  <a href={item.content} target="_blank">
+                                    {item.content}
+                                  </a>
+                                </p>
+                              ))}
                           </p>
                         </div>
                       </CardContent>
