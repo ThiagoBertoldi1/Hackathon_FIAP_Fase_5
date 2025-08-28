@@ -20,7 +20,14 @@ public class VideoCheckerController(IVideoCheckerService videoCheckerService) : 
             : BadRequest("Upload failed");
     }
 
-    [HttpGet("get")]
+    [HttpGet("get-all-jobs")]
+    public async Task<IActionResult> GetAll()
+    {
+        var response = await _videoCheckerService.GetAllJobs();
+        return Ok(response);
+    }
+
+    [HttpGet("download-video")]
     public async Task<IActionResult> GetAll([FromQuery] string id)
     {
         var (file, type, name) = (await _videoCheckerService.DownloadVideo(id)).Value;

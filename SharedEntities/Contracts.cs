@@ -15,7 +15,6 @@ public record VideoJobCreated(
 
     DateTime CreatedAtUtc);
 
-
 public record VideoJobStatusChanged(
     [property: BsonId, BsonRepresentation(BsonType.ObjectId), JsonConverter(typeof(ObjectIdSystemTextConverter))]
     ObjectId Id,
@@ -25,6 +24,7 @@ public record VideoJobStatusChanged(
 
     StatusEnum Status,
     string? Message,
+    string VideoName,
     DateTime ChangedAtUtc);
 
 public record QrCodeFound(
