@@ -48,7 +48,7 @@ public class Worker(
         }
     }
 
-    private async Task Processar(IChannel channel, string queue, CancellationToken cancellationToken)
+    private async Task Processar(IChannel channel, string queue, CancellationToken stoppingToken)
     {
         await channel.QueueDeclareAsync(
             queue: queue,
@@ -56,9 +56,9 @@ public class Worker(
             exclusive: false,
             autoDelete: false,
             arguments: null,
-            cancellationToken: cancellationToken);
+            cancellationToken: stoppingToken);
 
-        await channel.BasicQosAsync(0, prefetchCount: 10, global: false, cancellationToken);
+        await channel.BasicQosAsync(0, prefetchCount: 10, global: false, stoppingToken);
 
         _logger.LogInformation("Waiting messages...");
 
@@ -77,11 +77,7 @@ public class Worker(
 
                 try
                 {
-                    var statusChanged = await _repository.UpdateJobStatus(entity.JobId, StatusEnum.Processing, "Vídeo sendo processado");
-                    if (!statusChanged)
-                        throw new Exception("Erro ao atualizar status do job");
-
-                    await ProcessaVideo(entity.JobId);
+                    await ProcessaVideo(entity.JobId, stoppingToken);
 
                     await ((AsyncEventingBasicConsumer)sender).Channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
                 }
@@ -111,17 +107,23 @@ public class Worker(
             queue,
             autoAck: false,
             consumer,
-            cancellationToken);
+            stoppingToken);
     }
 
-    private async Task ProcessaVideo(ObjectId jobId)
+    private async Task ProcessaVideo(ObjectId jobId, CancellationToken stoppingToken)
     {
-        var video = await _repository.DownloadVideo(jobId);
-        // processar vídeo
-        // // quebrar vídeo em frames
-        // // salvar qr code encontrado
-
         var statusChanged = await _repository.UpdateJobStatus(jobId, StatusEnum.Processing, "Vídeo sendo processado");
+        if (!statusChanged)
+            throw new Exception("Erro ao atualizar status do job");
+
+        var videoStream = await _repository.DownloadVideo(jobId);
+
+        // TODO:
+        // Quebrar o vídeo em frames
+        // Identificar QRCode nos frames
+        // Salvar os frames com QRCode no banco
+
+        statusChanged = await _repository.UpdateJobStatus(jobId, StatusEnum.Completed, "Vídeo processado");
         if (!statusChanged)
             throw new Exception("Erro ao atualizar status do job");
     }
