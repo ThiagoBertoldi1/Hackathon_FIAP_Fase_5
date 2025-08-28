@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { CalendarDays, Video, MessageSquare, Activity } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CalendarDays, Video, MessageSquare, Activity, Download } from 'lucide-react';
+import { Button } from './ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface DataItem {
   id: string;
@@ -28,6 +30,7 @@ const DataGrid = () => {
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<DataItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { toast } = useToast();
 
   const loadData = async () => {
     try {
@@ -88,6 +91,31 @@ const DataGrid = () => {
         return 'Erro';
     }
   }
+
+  const downloadVideo = async (jobId: string) => {
+    const response = await fetch(`http://localhost:5056/api/VideoChecker/download-video?id=${jobId}`)
+    if(!response.ok)
+      return toast({
+          title: "Erro",
+          description: "Não foi possível fazer o download do vídeo.",
+          variant: "destructive",
+        });
+
+      const cd = response.headers.get('Content-Disposition') ?? '';
+      const m = cd.match(/filename\*=UTF-8''([^;]+)|filename="?([^"]+)"?/i);
+      const fileName = decodeURIComponent(m?.[1] || m?.[2] || 'video.mp4');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
 
   const handleCardClick = (item: DataItem) => {
     setSelectedItem(item);
@@ -256,6 +284,14 @@ const DataGrid = () => {
                     </div>
                   </CardContent>
                 </Card>
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-primary hover:opacity-90 shadow-glow transition-all duration-300"
+                  onClick={() => downloadVideo(selectedItem.jobId)}
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Download
+                </Button>
               </div>
             </div>
           )}
