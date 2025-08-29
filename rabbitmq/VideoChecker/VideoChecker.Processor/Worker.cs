@@ -25,7 +25,11 @@ public class Worker(
     {
         try
         {
+#if DEBUG
+            var factory = new ConnectionFactory { Uri = new Uri("amqp://guest:guest@localhost:5672/") };
+#else
             var factory = new ConnectionFactory { HostName = _configuration["RabbitMQ:Host"]! };
+#endif
             using var conn = await factory.CreateConnectionAsync(stoppingToken);
             using var channel = await conn.CreateChannelAsync(cancellationToken: stoppingToken);
 
@@ -116,7 +120,7 @@ public class Worker(
         if (!statusChanged)
             throw new Exception("Erro ao atualizar status do job");
 
-        var videoStream = await _repository.DownloadVideo(jobId);
+        using var videoStream = await _repository.DownloadVideo(jobId);
 
         // TODO:
         // Quebrar o vídeo em frames
