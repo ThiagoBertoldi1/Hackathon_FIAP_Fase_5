@@ -13,6 +13,9 @@ services:
       - "5056:5056"
     networks:
       - app-net
+    depends_on:
+      mongo:
+        condition: service_healthy
 
   worker:
     container_name: videochecker_worker
@@ -23,6 +26,9 @@ services:
       DOTNET_ENVIRONMENT: "Staging"
     networks:
       - app-net
+    depends_on:
+      mongo:
+        condition: service_healthy
 
   frontend:
     container_name: videochecker_front
@@ -60,8 +66,13 @@ services:
     volumes:
       - mongo_data:/data/db
       - ./_data/_scripts:/docker-entrypoint-initdb.d:ro
-    networks:
-      - app-net
+    networks: [app-net]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
       
 volumes:
   mongo_data:
