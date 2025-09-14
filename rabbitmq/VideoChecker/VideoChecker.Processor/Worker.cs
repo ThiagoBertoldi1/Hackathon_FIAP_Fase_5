@@ -7,6 +7,7 @@ using SharedEntities.Enums;
 using System.Text;
 using System.Text.Json;
 using VideoChecker.Processor.Interfaces;
+using VideoChecker.Processor.Utils;
 
 namespace VideoChecker.Processor;
 
@@ -81,7 +82,7 @@ public class Worker(
 
                 try
                 {
-                    await ProcessaVideo(entity.JobId, stoppingToken);
+                    await ProcessaVideo(entity.JobId);
 
                     await ((AsyncEventingBasicConsumer)sender).Channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
                 }
@@ -114,7 +115,7 @@ public class Worker(
             stoppingToken);
     }
 
-    private async Task ProcessaVideo(ObjectId jobId, CancellationToken stoppingToken)
+    private async Task ProcessaVideo(ObjectId jobId)
     {
         var statusChanged = await _repository.UpdateJobStatus(jobId, StatusEnum.Processing, "Vídeo sendo processado");
         if (!statusChanged)
@@ -122,11 +123,16 @@ public class Worker(
 
         using var videoStream = await _repository.DownloadVideo(jobId);
 
-        // Salva o vídeo em frames PNG
-        await VideoFrames.SaveFramesAsPngAsync(videoStream);
+        var outputDir = Environment.CurrentDirectory + "\\tmp\\frames";
+
+        await VideoFrames.SaveFramesAsPngAsync(videoStream, outputDir);
+
+        var hits = await QrFromFrames.DetectQrInDirAsync(outputDir);
+
         // TODO:
-        // Identificar QRCode nos frames
         // Salvar os frames com QRCode no banco
+        foreach (var h in hits)
+            Console.WriteLine($"{h.File} -> {h.Text}");
 
         statusChanged = await _repository.UpdateJobStatus(jobId, StatusEnum.Completed, "Vídeo processado");
         if (!statusChanged)

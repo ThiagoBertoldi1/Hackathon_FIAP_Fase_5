@@ -1,13 +1,11 @@
 ﻿using FFMpegCore;
 
-namespace VideoChecker.Processor;
+namespace VideoChecker.Processor.Utils;
 
 public static class VideoFrames
 {
-    public static async Task SaveFramesAsPngAsync(Stream mongoStream)
+    public static async Task SaveFramesAsPngAsync(Stream mongoStream, string outputDir)
     {
-        var outputDir = Environment.CurrentDirectory + "\\tmp\\frames";
-
         Directory.CreateDirectory(outputDir);
         var outputPattern = Path.Combine(outputDir, "frame_%06d.png");
 
