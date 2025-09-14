@@ -82,7 +82,7 @@ public class Worker(
 
                 try
                 {
-                    await ProcessaVideo(entity.JobId);
+                    await ProcessaVideo(entity.JobId, stoppingToken);
 
                     await ((AsyncEventingBasicConsumer)sender).Channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
                 }
@@ -115,24 +115,21 @@ public class Worker(
             stoppingToken);
     }
 
-    private async Task ProcessaVideo(ObjectId jobId)
+    private async Task ProcessaVideo(ObjectId jobId, CancellationToken stoppingToken)
     {
         var statusChanged = await _repository.UpdateJobStatus(jobId, StatusEnum.Processing, "Vídeo sendo processado");
         if (!statusChanged)
             throw new Exception("Erro ao atualizar status do job");
 
+        var path = Environment.CurrentDirectory + "\\tmp\\frames";
+
         using var videoStream = await _repository.DownloadVideo(jobId);
 
-        var outputDir = Environment.CurrentDirectory + "\\tmp\\frames";
+        await VideoFrames.SaveFramesAsPngAsync(videoStream, path);
 
-        await VideoFrames.SaveFramesAsPngAsync(videoStream, outputDir);
-
-        var hits = await QrFromFrames.DetectQrInDirAsync(outputDir);
-
-        // TODO:
-        // Salvar os frames com QRCode no banco
-        foreach (var h in hits)
-            Console.WriteLine($"{h.File} -> {h.Text}");
+        var all = await QrFromFramesByFps.DetectAllAsync(path, stoppingToken);
+        foreach (var h in all)
+            await _repository.InsertEntity(new QrCodeFound(ObjectId.GenerateNewId(), jobId, h.TimestampSeconds, h.Text, DateTime.Now));
 
         statusChanged = await _repository.UpdateJobStatus(jobId, StatusEnum.Completed, "Vídeo processado");
         if (!statusChanged)

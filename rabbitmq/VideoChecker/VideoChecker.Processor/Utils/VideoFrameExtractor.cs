@@ -20,7 +20,7 @@ public static class VideoFrames
                 .OutputToFile(outputPattern, overwrite: true, o =>
                 {
                     o.WithVideoCodec("png");
-                    o.WithCustomArgument("-an");
+                    o.WithCustomArgument("-an -vsync 0");
                 });
 
             await args.ProcessAsynchronously();
