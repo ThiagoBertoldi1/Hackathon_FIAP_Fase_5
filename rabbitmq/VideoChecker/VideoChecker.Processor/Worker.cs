@@ -122,8 +122,9 @@ public class Worker(
 
         using var videoStream = await _repository.DownloadVideo(jobId);
 
+        // Salva o vídeo em frames PNG
+        await VideoFrames.SaveFramesAsPngAsync(videoStream);
         // TODO:
-        // Quebrar o vídeo em frames
         // Identificar QRCode nos frames
         // Salvar os frames com QRCode no banco
 
