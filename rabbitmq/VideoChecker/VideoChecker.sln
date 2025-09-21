@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoChecker.Processor", "V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedEntities", "..\..\SharedEntities\SharedEntities.csproj", "{2B8825AA-970D-4F97-D017-737431B835D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoChecker.Test", "VideoChecker.Test\VideoChecker.Test.csproj", "{7ABB298A-C2A1-40FA-91C9-C3CF9D482BB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2B8825AA-970D-4F97-D017-737431B835D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B8825AA-970D-4F97-D017-737431B835D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B8825AA-970D-4F97-D017-737431B835D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ABB298A-C2A1-40FA-91C9-C3CF9D482BB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ABB298A-C2A1-40FA-91C9-C3CF9D482BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ABB298A-C2A1-40FA-91C9-C3CF9D482BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ABB298A-C2A1-40FA-91C9-C3CF9D482BB8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
